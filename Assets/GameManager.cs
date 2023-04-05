@@ -32,6 +32,7 @@ public class GameManager :  MonoBehaviour
         foreach(var socket in SocketInteractors)
         {
             socket.onSelectEntered.AddListener(OnTable);
+            socket.onSelectExited.AddListener(OutTable);
         }
     }
     private void GetObjectMaterials()
@@ -61,5 +62,11 @@ public class GameManager :  MonoBehaviour
       var ontableobject = interactable.gameObject;
         var mat = ontableobject.transform.GetChild(0).gameObject.GetComponent<Renderer>().material;
         matsonTable.Add(mat);
+    }  
+    public void OutTable(XRBaseInteractable interactable)
+    {
+      var outtableobject = interactable.gameObject;
+        var mat = outtableobject.transform.GetChild(0).gameObject.GetComponent<Renderer>().material;
+        matsonTable.Remove(mat);
     }
 }
