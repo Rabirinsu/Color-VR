@@ -10,10 +10,13 @@ public class GameManager :  MonoBehaviour
     [SerializeField] private Slider rSlider;
     [SerializeField] private Slider gSlider;
     [SerializeField] private Slider bSlider;
-    [SerializeField] private List<GameObject> rocks;
+    public List<GameObject> bones;
+    public List<IntaractThings> intaractors;
     [SerializeField] private List<Material> rock_Materials;
     [SerializeField] private List<Material> matsonTable;
     [SerializeField] private List<XRSocketInteractor> SocketInteractors;
+    public List<GameObject> ontableObjects;
+    public bool stickLock;
     void Start()
     {
 
@@ -26,6 +29,11 @@ public class GameManager :  MonoBehaviour
             instance = this;
         }
         UpdateSocketInteractors();
+        foreach(var bone in bones)
+        {
+            intaractors.Add(bone.GetComponent<IntaractThings>());
+        }
+       
     }
     private void UpdateSocketInteractors()
     {
@@ -38,7 +46,7 @@ public class GameManager :  MonoBehaviour
     private void GetObjectMaterials()
     {
         var i = 0;
-        foreach (var rock in rocks)
+        foreach (var rock in bones)
         {
             rock_Materials[i] = rock.transform.GetChild(0).gameObject.GetComponent<Renderer>().material;
             i++;
@@ -62,11 +70,45 @@ public class GameManager :  MonoBehaviour
       var ontableobject = interactable.gameObject;
         var mat = ontableobject.transform.GetChild(0).gameObject.GetComponent<Renderer>().material;
         matsonTable.Add(mat);
+        ontableObjects.Add(ontableobject);
     }  
     public void OutTable(XRBaseInteractable interactable)
     {
       var outtableobject = interactable.gameObject;
         var mat = outtableobject.transform.GetChild(0).gameObject.GetComponent<Renderer>().material;
         matsonTable.Remove(mat);
+        ontableObjects.Remove(outtableobject);
+    }
+    public void Reset()
+    {
+        foreach(var ontableobject in ontableObjects)
+        {
+            ontableobject.GetComponent<IntaractThings>().Release();
+        }
+    }
+    public void SetStick()
+    {
+        if(!stickLock)
+        {
+            foreach (var bone in bones)
+            {
+                bone.GetComponent<FixedJoint>().connectedBody = null;
+               for(var i=1;i < intaractors[i].connectedObjects.Count; i++)
+                {
+                    intaractors[i].connectedObjects.RemoveAt(i);
+                }
+
+            }
+            stickLock = true;
+            return;
+        }
+        else 
+        {
+            stickLock = false;
+
+       
+        }
+      
+
     }
 }
